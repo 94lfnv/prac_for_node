@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const path = require("path");
-const iconv = require("iconv-lite");
 const multer = require("multer");
 const moment = require("moment");
 
@@ -25,16 +24,9 @@ const storage = multer.diskStorage({
 //사진 파일
 const upload = multer({ storage: storage });
 
-// //이미지 파일 불러올 때 Cors 에러 방지
-// const options = {
-//   setHeaders: function (res, path, stat) {
-//     res.set("Access-Control-Allow-Origin", "*");
-//   },
-// };
-
-router.get("/getAllRef", (req, res) => {
+router.get("/getAllPart", (req, res) => {
   const sql =
-    "SELECT seq, title, link, writer, menu_type, wri_time, thumbnail FROM podobot.reference";
+    "SELECT seq, com_type, com_name, com_intro, com_link, writer, wri_time, thumbnail FROM podobot.partners";
 
   dbConnect.query(sql, (err, rows) => {
     if (err) {
@@ -46,16 +38,17 @@ router.get("/getAllRef", (req, res) => {
   });
 });
 
-router.post("/postRef", upload.array("file"), async (req, res) => {
+router.post("/postPart", upload.array("file"), async (req, res) => {
   const sql =
-    "INSERT INTO podobot.reference(seq, title, link, writer, menu_type, wri_time, thumbnail) " +
-    " VALUES(0, ?, ?, ?, ?, NOW(), ?)";
+    "INSERT INTO podobot.partners(seq, com_type, com_name, com_intro, com_link, writer, wri_time, thumbnail) " +
+    " VALUES(0, ?, ?, ?, ?, ?, NOW(), ?)";
 
   let param = [
-    req.body.title,
-    req.body.link,
+    req.body.com_type,
+    req.body.com_name,
+    req.body.com_intro,
+    req.body.com_link,
     req.body.writer,
-    req.body.menu_type,
   ];
 
   req.files.map((data) => {

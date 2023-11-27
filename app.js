@@ -16,7 +16,10 @@ app.listen(port, () => {
   console.log("Listening on port 3001...");
 });
 
+app.use("/getImgs", express.static(__dirname + "/src/uploads", options));
+
 const ref = require("./src/routes/reference");
 app.use("/ref", ref);
 
-app.use("/ref/getImgs", express.static(__dirname + "/src/uploads", options));
+const part = require("./src/routes/partners");
+app.use("/partners", part);
