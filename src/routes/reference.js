@@ -2,6 +2,7 @@ const router = require("express").Router();
 const path = require("path");
 const iconv = require("iconv-lite");
 const multer = require("multer");
+const moment = require("moment");
 
 const dbConnect = require("../config/db.config").init();
 
@@ -13,12 +14,10 @@ const storage = multer.diskStorage({
     const newFileName = path.extname(file.originalname);
     cb(
       null,
-      // path.basename(     iconv.decode(file.originalname.replace(/ /g,
-      // "").toString(), "UTF-8"),     ext ) + "-" + Date.now() + ext
-      path.basename(
-        iconv.decode(file.originalname.replace(/ /g, "").toString(), "UTF-8"),
+      path.basename(file.originalname, newFileName) +
+        "-" +
+        moment(Date.now()).format("HHmmss") +
         newFileName
-      ) + newFileName
     );
   },
 });
@@ -26,12 +25,12 @@ const storage = multer.diskStorage({
 //사진 파일
 const upload = multer({ storage: storage });
 
-//이미지 파일 불러올 때 Cors 에러 방지
-const options = {
-  setHeaders: function (res, path, stat) {
-    res.set("Access-Control-Allow-Origin", "*");
-  },
-};
+// //이미지 파일 불러올 때 Cors 에러 방지
+// const options = {
+//   setHeaders: function (res, path, stat) {
+//     res.set("Access-Control-Allow-Origin", "*");
+//   },
+// };
 
 router.get("/getAllRef", (req, res) => {
   const sql =
@@ -42,6 +41,7 @@ router.get("/getAllRef", (req, res) => {
       console.log("query is not excuted", err);
       res.send({ result: 4 });
     } else {
+      console.log(rows, "rowsssssssssssss");
       res.send({ result: 0, data: rows });
     }
   });
@@ -60,12 +60,14 @@ router.post("/postRef", upload.array("file"), async (req, res) => {
   ];
 
   req.files.map((data) => {
-    param.push(data.filename);
+    if (data.length === 0) {
+      param.push(null);
+    } else {
+      param.push(data.filename);
+    }
+    console.log(req.files, "reqqqqqqqqqqqqqqqq");
+    console.log(data, "reqqqqqqqqqqqqqqqq");
   });
-
-  if (req.files.length === 0) {
-    param.push(null);
-  }
 
   dbConnect.query(sql, param, (err, rows, fields) => {
     if (err) {
