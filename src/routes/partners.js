@@ -1,25 +1,8 @@
 const router = require("express").Router();
-const path = require("path");
 const multer = require("multer");
-const moment = require("moment");
+const storage = require("./storage");
 
 const dbConnect = require("../config/db.config").init();
-
-const storage = multer.diskStorage({
-  destination: (req, res, cb) => {
-    cb(null, "./src/uploads");
-  },
-  filename: (req, file, cb) => {
-    const newFileName = path.extname(file.originalname);
-    cb(
-      null,
-      path.basename(file.originalname, newFileName) +
-        "-" +
-        moment(Date.now()).format("HHmmss") +
-        newFileName
-    );
-  },
-});
 
 //사진 파일
 const upload = multer({ storage: storage });
