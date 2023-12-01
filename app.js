@@ -23,3 +23,6 @@ app.use("/ref", ref);
 
 const part = require("./src/routes/partners");
 app.use("/partners", part);
+
+const prod = require("./src/routes/ourProduct");
+app.use("/product", prod);
